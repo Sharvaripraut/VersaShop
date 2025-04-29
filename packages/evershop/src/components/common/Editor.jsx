@@ -4,7 +4,12 @@ import getRowClasses from './form/fields/editor/GetRowClasses';
 import getColumnClasses from './form/fields/editor/GetColumnClasses';
 
 function Paragraph({ data }) {
-  return <p dangerouslySetInnerHTML={{ __html: data.text }} />;
+  return (
+    <p 
+      className="leading-relaxed text-gray-700 mb-5" 
+      dangerouslySetInnerHTML={{ __html: data.text }} 
+    />
+  );
 }
 
 Paragraph.propTypes = {
@@ -15,7 +20,20 @@ Paragraph.propTypes = {
 
 function Header({ data }) {
   const Tag = `h${data.level}`;
-  return <Tag>{data.text}</Tag>;
+  const headerClasses = {
+    1: 'text-3xl font-bold text-gray-900 mb-6 leading-tight',
+    2: 'text-2xl font-semibold text-gray-800 mb-5 leading-tight',
+    3: 'text-xl font-medium text-gray-800 mb-4',
+    4: 'text-lg font-medium text-gray-700 mb-3',
+    5: 'text-base font-medium text-gray-700 mb-3',
+    6: 'text-sm font-medium text-gray-700 mb-3'
+  };
+  
+  return (
+    <Tag className={headerClasses[data.level] || ''}>
+      {data.text}
+    </Tag>
+  );
 }
 
 Header.propTypes = {
@@ -27,9 +45,9 @@ Header.propTypes = {
 
 function List({ data }) {
   return (
-    <ul>
+    <ul className="list-disc pl-5 mb-6 text-gray-700 space-y-1.5">
       {data.items.map((item, index) => (
-        <li key={index}>{item}</li>
+        <li key={index} className="mb-1">{item}</li>
       ))}
     </ul>
   );
@@ -43,9 +61,13 @@ List.propTypes = {
 
 function Quote({ data }) {
   return (
-    <blockquote>
-      <p>&quot;{data.text}&quot;</p>
-      {data.caption && <cite>- {data.caption}</cite>}
+    <blockquote className="border-l-4 border-gray-300 pl-4 py-2 my-5 italic text-gray-700 relative">
+      <p className="mb-1">&quot;{data.text}&quot;</p>
+      {data.caption && (
+        <cite className="block text-right text-sm text-gray-500 mt-2 not-italic">
+          — {data.caption}
+        </cite>
+      )}
     </blockquote>
   );
 }
@@ -60,31 +82,47 @@ Quote.propTypes = {
 function Image({ data }) {
   const { file, caption, withBorder, withBackground, stretched, url } = data;
 
-  const imageStyles = {
-    border: withBorder ? '1px solid #ccc' : 'none',
-    backgroundColor: withBackground ? '#f9f9f9' : 'transparent',
-    width: stretched ? '100%' : 'auto',
-    display: 'block',
-    maxWidth: '100%',
-    margin: '0 auto' // Center the image if not stretched
-  };
+  const imageContainerClasses = [
+    'my-6',
+    withBackground ? 'bg-gray-50 p-3 rounded-md' : ''
+  ].filter(Boolean).join(' ');
+  
+  const imageClasses = [
+    'max-w-full h-auto mx-auto rounded-lg',
+    withBorder ? 'border border-gray-200' : '',
+    stretched ? 'w-full' : ''
+  ].filter(Boolean).join(' ');
 
   const imageElement = (
-    <img src={file.url} alt={caption || 'Image'} style={imageStyles} />
+    <img 
+      src={file.url} 
+      alt={caption || 'Image'} 
+      className={imageClasses}
+      loading="lazy"
+    />
   );
 
   return (
-    <div>
-      {url ? (
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          {imageElement}
-        </a>
-      ) : (
-        imageElement
-      )}
-      {caption && (
-        <p style={{ textAlign: 'center', marginTop: '10px' }}>{caption}</p>
-      )}
+    <div className={imageContainerClasses}>
+      <figure>
+        {url ? (
+          <a 
+            href={url} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="block transition-opacity hover:opacity-90"
+          >
+            {imageElement}
+          </a>
+        ) : (
+          imageElement
+        )}
+        {caption && (
+          <figcaption className="text-center text-sm text-gray-500 mt-2">
+            {caption}
+          </figcaption>
+        )}
+      </figure>
     </div>
   );
 }
@@ -103,7 +141,9 @@ Image.propTypes = {
 };
 
 function RawHtml({ data }) {
-  return <div dangerouslySetInnerHTML={{ __html: data.html }} />;
+  return (
+    <div className="raw-html-container my-4" dangerouslySetInnerHTML={{ __html: data.html }} />
+  );
 }
 
 RawHtml.propTypes = {
@@ -157,15 +197,15 @@ export default function Editor({ rows }) {
             className={`row__container mt-12 grid md:${rowClasses} grid-cols-1 gap-8`}
             key={index}
           >
-            {row.columns.map((column, index) => {
-              const columnClasses = getColumnClasses(column.size);
+            {row.columns.map((columnIndex, index) => {
+              const columnClasses = getColumnClasses(columnIndex.size);
               return (
                 <div
-                  className={`column__container md:${columnClasses} col-span-1`}
+                  className={`column__container md:${columnClasses} col-span-1 rounded-lg overflow-hidden`}
                   key={index}
                 >
-                  {column.data?.blocks && (
-                    <RenderEditorJS blocks={column.data?.blocks} />
+                  {columnIndex.data?.blocks && (
+                    <RenderEditorJS blocks={columnIndex.data?.blocks} />
                   )}
                 </div>
               );
