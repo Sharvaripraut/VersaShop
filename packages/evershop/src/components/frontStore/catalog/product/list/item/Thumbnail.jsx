@@ -6,16 +6,30 @@ import ProductNoThumbnail from '@components/common/ProductNoThumbnail';
 function Thumbnail({ url, imageUrl, alt }) {
   return (
     <div className="product-thumbnail-listing">
-      {imageUrl && (
-        <a href={url}>
-          <img src={imageUrl} alt={alt} />
-        </a>
-      )}
-      {!imageUrl && (
-        <a href={url}>
-          <ProductNoThumbnail width={100} height={100} />
-        </a>
-      )}
+      <a href={url} className="thumbnail-link">
+        <div className="thumbnail-container">
+          {imageUrl ? (
+            <img 
+              src={imageUrl} 
+              alt={alt} 
+              className="product-image"
+              loading="lazy"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+          ) : (
+            <div className="no-image">
+              <ProductNoThumbnail width={120} height={120} />
+            </div>
+          )}
+        </div>
+        <div className="thumbnail-overlay">
+          <span className="view-product">View Product</span>
+        </div>
+      </a>
     </div>
   );
 }

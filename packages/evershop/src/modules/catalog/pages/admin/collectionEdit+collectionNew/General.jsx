@@ -14,19 +14,19 @@ export default function General({
   folderCreateApi
 }) {
   const fields = [
-    {
-      component: { default: Field },
-      props: {
-        id: 'name',
-        name: 'name',
-        label: 'Name',
-        validationRules: ['notEmpty'],
-        placeholder: 'Featured Products',
-        type: 'text'
-      },
-      sortOrder: 10,
-      id: 'name'
-    },
+    // {
+    //   component: { default: Field },
+    //   props: {
+    //     id: 'name',
+    //     name: 'name',
+    //     label: 'Name',
+    //     validationRules: ['notEmpty'],
+    //     placeholder: 'Featured Products',
+    //     type: 'text'
+    //   },
+    //   sortOrder: 10,
+    //   id: 'name'
+    // },
     {
       component: { default: Field },
       props: {
